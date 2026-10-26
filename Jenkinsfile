@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -44,12 +45,28 @@ pipeline {
                     passwordVariable: 'DOCKERHUB_TOKEN'
                 )]) {
                     sh '''
-                        echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                            -u "$DOCKERHUB_USER" --password-stdin
+
                         docker push "$DOCKERHUB_USER/multi-stage-demo:latest"
+
                         docker logout
                     '''
                 }
             }
         }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh '''
+                    docker compose up -d
+                    docker compose ps
+                    curl --fail http://localhost:8081
+                    docker compose exec -T redis redis-cli ping
+                '''
+            }
+        }
     }
 }
+
+   
