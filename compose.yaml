@@ -1,7 +1,6 @@
 services:
   app:
     image: shrutibisen20/multi-stage-demo:latest
-    container_name: python-app
     command: python app.py
 
   web:
